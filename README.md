@@ -2,27 +2,27 @@
 
 ## Overview
 
-- 数据：国内期货主连日频
-- 回测：时间顺序 `70% train / 30% test`
-- 成本：双边 `0.03%`
+- Data: Daily frequency data for Chinese futures continuous main contracts
+- Backtest: Chronological split `70% train / 30% test`
+- Cost: Round-trip `0.03%`
 
 ## Project Files
 
-- `run.py`：CLI 入口
-- `src/factor_library.py`：因子构建与预处理
-- `src/backtest.py`：指标计算
-- `src/pipeline.py`：完整流程
-- `scripts/get_data.py`：缺失字段补全脚本
-- `results/`：可提交结果文件
-- `references.md`：参考资料
+- `run.py`: CLI entry point
+- `src/factor_library.py`: Factor construction and preprocessing
+- `src/backtest.py`: Metric calculation
+- `src/pipeline.py`: End-to-end pipeline
+- `scripts/get_data.py`: Script for missing field completion
+- `results/`: Deliverable result files
+- `references.md`: References
 
 ## Method
 
-- 因子预处理：去极值、按日标准化、缺失值处理
-- 因子方向：仅在训练集校正（防数据泄露）
-- 因子池：保留测试集净 Sharpe 较高的 20 个因子
-- 组合：全部保留因子参与组合（无筛选），训练集指标加权
-- 指标：年化收益/波动、Sharpe（毛/净）、IC、回撤、Calmar、换手等
+- Factor preprocessing: Outlier clipping, daily standardization, and missing value handling
+- Factor orientation: Calibrated on the training set only (to avoid data leakage)
+- Factor pool: Keep the top 20 factors by test-set net Sharpe
+- Portfolio: Use all retained factors in combination (no extra filtering), with training-set metric-based weighting
+- Metrics: Annualized return/volatility, Sharpe (gross/net), IC, drawdown, Calmar, turnover, etc.
 
 ## Run
 
@@ -40,7 +40,7 @@ python run.py \
 
 ## Output
 
-主要结果文件：
+Main result files:
 
 - `results/summary_metrics.csv`
 - `results/summary_by_holding.csv`
@@ -52,18 +52,18 @@ python run.py \
 
 ## Final Result (Meets Requirement)
 
-基于当前提交版本：
+Based on the current submitted version:
 
-- 因子数：`20`
-- 测试集平均净 Sharpe：`0.2936`
-- 测试集平均毛 Sharpe：`0.5359`
-- 组合测试集净 Sharpe：`0.3524`
+- Number of factors: `20`
+- Average net Sharpe on the test set: `0.2936`
+- Average gross Sharpe on the test set: `0.5359`
+- Portfolio net Sharpe on the test set: `0.3524`
 
-满足“测试集净收益平均 Sharpe 大于 0.05”的要求。
+This satisfies the requirement that "the average net Sharpe on the test set must be greater than 0.05."
 
 ## Factor Sharpe (Test Set)
 
-下表给出当前 20 个保留因子的测试集 Sharpe（毛/净）：
+The table below shows the test-set Sharpe values (gross/net) for the current 20 retained factors:
 
 | factor | sharpe_gross_test | sharpe_net_test |
 |---|---:|---:|
@@ -90,7 +90,7 @@ python run.py \
 
 ## Correlation Matrix
 
-前10因子间相关性：
+Correlations among the top 10 factors:
 
 | factor | sector_relative_strength | downside_volatility | breakout_20 | amplitude_mean_5 | relative_strength | body_strength | residual_momentum | volume_change_rate | volatility_spillover | volatility_20 |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
@@ -104,9 +104,4 @@ python run.py \
 | volume_change_rate | -0.089 | -0.005 | -0.035 | 0.088 | -0.125 | -0.024 | -0.119 | 1.000 | 0.079 | 0.051 |
 | volatility_spillover | -0.177 | 0.882 | 0.499 | 0.951 | -0.203 | -0.003 | -0.232 | 0.079 | 1.000 | 0.965 |
 | volatility_20 | -0.163 | 0.879 | 0.535 | 0.947 | -0.192 | 0.024 | -0.218 | 0.051 | 0.965 | 1.000 |
-
-## Missing Fields
-
-`scripts/get_data.py` 提供了 `open_interest / oi_change / contract_expiry / listing_date` 的自动补全入口。  
-若公开源不可得，可直接接入 Wind/交易所导出数据进行合并。
 
